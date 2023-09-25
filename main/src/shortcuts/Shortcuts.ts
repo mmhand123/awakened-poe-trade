@@ -66,6 +66,7 @@ export class Shortcuts {
     uIOhook.on('keydown', (e) => {
       if (!this.logKeys) return
       const pressed = eventToString(e)
+      console.log("PRESSED", pressed)
       this.logger.write(`debug [Shortcuts] Keydown ${pressed}`)
     })
     uIOhook.on('keyup', (e) => {
@@ -98,17 +99,18 @@ export class Shortcuts {
     this.clipboard.updateOptions(restoreClipboard)
     this.ocrWorker.updateOptions(language)
 
-    const copyItemShortcut = mergeTwoHotkeys('Ctrl + C', this.gameConfig.showModsKey)
-    if (copyItemShortcut !== 'Ctrl + C') {
-      actions.push({
-        shortcut: copyItemShortcut,
-        action: { type: 'test-only' }
-      })
-    }
+    console.log(this.gameConfig.showModsKey)
+    const copyItemShortcut = 'Ctrl + Alt + C'
+    // if (copyItemShortcut !== 'Meta + C') {
+    //   actions.push({
+    //     shortcut: copyItemShortcut,
+    //     action: { type: 'test-only' }
+    //   })
+    // }
 
     const allShortcuts = new Set([
-      'Ctrl + C', 'Ctrl + V', 'Ctrl + A',
-      'Ctrl + F',
+      'Meta + C', 'Meta + V', 'Meta + A',
+      'Meta + F',
       'Ctrl + Enter',
       'Home', 'Delete', 'Enter',
       'ArrowUp', 'ArrowRight', 'ArrowLeft',
@@ -139,6 +141,7 @@ export class Shortcuts {
   private register () {
     for (const entry of this.actions) {
       const isOk = globalShortcut.register(shortcutToElectron(entry.shortcut), () => {
+        console.log(entry)
         if (this.logKeys) {
           this.logger.write(`debug [Shortcuts] Action type: ${entry.action.type}`)
         }
@@ -179,10 +182,7 @@ export class Shortcuts {
               }
             }).catch(() => {})
 
-          pressKeysToCopyItemText(
-            (entry.keepModKeys) ? entry.shortcut.split(' + ').filter(key => isModKey(key)) : undefined,
-            this.gameConfig.showModsKey
-          )
+          pressKeysToCopyItemText()
         } else if (entry.action.type === 'ocr-text' && entry.action.target === 'heist-gems') {
           if (process.platform !== 'win32') return
 
@@ -222,9 +222,10 @@ export class Shortcuts {
   }
 }
 
-function pressKeysToCopyItemText (pressedModKeys: string[] = [], showModsKey: string) {
-  let keys = mergeTwoHotkeys('Ctrl + C', showModsKey).split(' + ')
-  keys = keys.filter(key => key !== 'C' && !pressedModKeys.includes(key))
+function pressKeysToCopyItemText () {
+  let keys = 'Ctrl + Alt + C'.split(' + ')
+  keys = keys.filter(key => key !== 'C')
+  console.log(keys)
 
   for (const key of keys) {
     uIOhook.keyToggle(UiohookKey[key as UiohookKeyT], 'down')
@@ -249,6 +250,8 @@ function isStashArea (mouse: UiohookWheelEvent, poeWindow: GameWindow): boolean 
 
 function eventToString (e: { keycode: number, ctrlKey: boolean, altKey: boolean, shiftKey: boolean }) {
   const { ctrlKey, shiftKey, altKey } = e
+
+  console.log({ctrlKey, shiftKey, altKey})
 
   let code = UiohookToName[e.keycode]
   if (!code) return 'not_supported_key'

@@ -545,9 +545,10 @@ function getConfigForHost (): HostConfig {
 
   const config = AppConfig()
   const priceCheck = AppConfig('price-check') as widget.PriceCheckWidget
+  console.log(priceCheck)
   if (priceCheck.hotkey) {
     actions.push({
-      shortcut: `${priceCheck.hotkeyHold} + ${priceCheck.hotkey}`,
+      shortcut: `Ctrl + D`,
       action: { type: 'copy-item', target: 'price-check', focusOverlay: false },
       keepModKeys: true
     })
