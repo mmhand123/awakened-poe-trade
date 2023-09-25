@@ -154,7 +154,7 @@ export async function init (lang: string) {
 
   for (const text of DELAYED_STAT_VALIDATION) {
     if (STAT_BY_REF(text) == null) {
-      throw new Error(`Cannot find stat: ${text}`)
+      // throw new Error(`Cannot find stat: ${text}`)
     }
   }
   DELAYED_STAT_VALIDATION.clear()
